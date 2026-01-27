@@ -1,36 +1,24 @@
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 
-// 关键修复：防止某些模块寻找 process 对象而报错
-if (typeof (window as any).process === 'undefined') {
-  (window as any).process = { env: { NODE_ENV: 'production' } };
-}
-
-const startApp = () => {
-  const rootElement = document.getElementById('root');
-  if (!rootElement) return;
-
-  try {
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
-    console.log("App mounted successfully");
-  } catch (err) {
-    console.error("Mounting error:", err);
-    if ((window as any).displayFatalError) {
-      (window as any).displayFatalError(err);
-    }
+// 简单的错误边界提示
+const handleError = (msg: string) => {
+  const root = document.getElementById('root');
+  if (root && root.innerHTML.includes('正在启动')) {
+    root.innerHTML = `<div style="padding:40px;text-align:center;color:#666;">
+      <p>启动受阻</p>
+      <p style="font-size:12px;color:#999;">请尝试关闭浏览器 AI 插件或使用无痕模式</p>
+      <button onclick="location.reload()" style="margin-top:20px;padding:10px 20px;background:#000;color:#fff;border:none;border-radius:20px;">刷新重试</button>
+    </div>`;
   }
 };
 
-// 立即尝试启动，不再等待 load 事件以减少被拦截概率
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  startApp();
-} else {
-  window.addEventListener('DOMContentLoaded', startApp);
+window.onerror = () => handleError('Runtime Error');
+
+const container = document.getElementById('root');
+if (container) {
+  const root = createRoot(container);
+  root.render(<App />);
 }
