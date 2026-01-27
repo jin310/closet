@@ -6,11 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>我的衣橱</title>
   
-  <!-- PWA Meta Tags -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ffffff">
   
-  <!-- iOS Specific Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="我的衣橱">
@@ -33,7 +31,7 @@
       flex-direction: column;
     }
     #root:empty::before {
-      content: '正在初始化衣橱系统...';
+      content: '正在连接衣橱服务...';
       display: flex;
       align-items: center;
       justify-content: center;
@@ -43,25 +41,19 @@
       font-weight: 500;
       letter-spacing: 0.1em;
     }
-    ::-webkit-scrollbar {
-      display: none;
-    }
-    .safe-bottom {
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    .safe-top {
-      padding-top: env(safe-area-inset-top);
-    }
+    ::-webkit-scrollbar { display: none; }
+    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+    .safe-top { padding-top: env(safe-area-inset-top); }
   </style>
   <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
-    "react/": "https://esm.sh/react@19.0.0/",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@1.3.0"
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
@@ -69,17 +61,34 @@
 <body class="text-gray-900">
   <div id="root"></div>
   <script>
-    // 增强型错误捕获
-    window.addEventListener('unhandledrejection', function(event) {
-      console.error('Unhandled promise rejection:', event.reason);
-      if (!document.getElementById('root').childNodes.length) {
-        document.getElementById('root').innerHTML = 
-          '<div style="padding:40px;text-align:center;color:#666;">' +
-          '<p style="font-weight:bold;">系统启动异常</p>' +
-          '<p style="font-size:12px;opacity:0.6;">可能是网络抖动导致模块加载中断</p>' +
-          '<button onclick="location.reload()" style="margin-top:20px;padding:8px 20px;background:#000;color:#fff;border-radius:20px;font-size:12px;">重试加载</button>' +
-          '</div>';
+    // 深度错误诊断工具
+    function showError(msg, details = '') {
+      const root = document.getElementById('root');
+      // 只有在页面还处于加载态时才覆盖显示错误
+      if (!root.childNodes.length || root.innerText.includes('正在')) {
+        root.innerHTML = `
+          <div style="padding:40px;text-align:center;color:#666;font-family:sans-serif;background:#f9f9f9;height:100vh;display:flex;flex-direction:column;justify-content:center;">
+            <p style="font-weight:bold;margin-bottom:8px;color:#000;">衣橱启动失败</p>
+            <p style="font-size:12px;opacity:0.6;margin-bottom:4px;">错误详情：</p>
+            <code style="font-size:10px;background:#eee;padding:10px;border-radius:8px;word-break:break-all;display:block;margin-bottom:20px;">${msg}</code>
+            <button onclick="location.reload()" style="align-self:center;padding:10px 30px;background:#000;color:#fff;border-radius:30px;font-size:12px;border:none;font-weight:bold;">刷新重试</button>
+          </div>
+        `;
       }
+    }
+
+    window.addEventListener('error', function(event) {
+      showError(event.message || '脚本执行异常');
+    });
+    
+    window.addEventListener('unhandledrejection', function(event) {
+      console.error('Promise Rejection:', event.reason);
+      let msg = '未知错误';
+      try {
+        const reason = event.reason;
+        msg = typeof reason === 'string' ? reason : (reason?.message || JSON.stringify(reason));
+      } catch(e) { msg = '无法解析的错误对象'; }
+      showError(msg);
     });
   </script>
 </body>
