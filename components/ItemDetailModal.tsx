@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ClosetItem, MainCategory, Outfit } from '../types.ts';
 
@@ -34,7 +33,7 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
 
   const DetailRow = ({ label, value, field, type = "text" }: { label: string, value: string | undefined, field: keyof ClosetItem, type?: string }) => (
     <div className="py-4 border-b border-gray-50 last:border-0">
-      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-1">{label}</label>
+      <label className="text-[10px] text-gray-400 uppercase tracking-widest block mb-1">{label}</label>
       {isEditing ? (
         field === 'mainCategory' ? (
           <select 
@@ -49,12 +48,12 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
             type={type}
             value={(editedItem[field] as string) || ''}
             onChange={e => setEditedItem({...editedItem, [field]: e.target.value})}
-            className="w-full bg-white border-b border-gray-200 py-1 text-sm outline-none focus:border-black font-bold text-black"
+            className="w-full bg-white border-b border-gray-200 py-1 text-sm outline-none focus:border-black text-black"
             placeholder={`输入${label}`}
           />
         )
       ) : (
-        <p className="text-sm font-bold text-black">{value || '--'}</p>
+        <p className="text-sm text-black">{value || '--'}</p>
       )}
     </div>
   );
@@ -66,13 +65,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
       <div className="relative w-full max-w-md bg-white rounded-t-3xl sm:rounded-3xl overflow-hidden animate-slide-up max-h-[95vh] flex flex-col">
         {/* Header */}
         <div className="p-4 border-b border-gray-50 flex justify-between items-center bg-white sticky top-0 z-10">
-          <button onClick={onClose} className="text-gray-300 font-bold p-2 text-xs uppercase tracking-widest">返回</button>
-          <h2 className="font-black text-black text-sm tracking-tighter uppercase">ITEM DETAILS</h2>
+          <button onClick={onClose} className="text-gray-300 p-2 text-xs uppercase tracking-widest">返回</button>
+          <h2 className="text-black text-sm tracking-tighter uppercase">单品详情</h2>
           <button 
             onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-            className={`font-black p-2 text-xs uppercase tracking-widest ${isEditing ? 'text-green-600' : 'text-black'}`}
+            className={`p-2 text-xs uppercase tracking-widest ${isEditing ? 'text-green-600' : 'text-black'}`}
           >
-            {isEditing ? 'DONE' : 'EDIT'}
+            {isEditing ? '完成' : '编辑'}
           </button>
         </div>
 
@@ -83,8 +82,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
             <div className="absolute inset-x-0 bottom-0 bg-white/95 backdrop-blur-sm p-8">
               {!isEditing && (
                 <div>
-                  <h3 className="text-black text-2xl font-black italic uppercase tracking-tighter leading-tight">{item.name}</h3>
-                  <p className="text-gray-400 text-[10px] font-black uppercase mt-1 tracking-[0.2em]">{item.subCategory}</p>
+                  <h3 className="text-black text-xl italic uppercase tracking-tighter leading-tight">{item.name}</h3>
+                  <p className="text-gray-400 text-[10px] uppercase mt-1 tracking-[0.2em]">{item.subCategory}</p>
                 </div>
               )}
             </div>
@@ -114,8 +113,8 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
 
             {!isEditing && (
               <div className="mt-12">
-                <h3 className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
-                  灵感搭配
+                <h3 className="text-[10px] text-gray-300 uppercase tracking-[0.3em] mb-6 flex items-center gap-3">
+                  相关穿搭
                   <span className="flex-1 h-[1px] bg-gray-50"></span>
                 </h3>
                 {relatedOutfits.length > 0 ? (
@@ -135,14 +134,14 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
                               ))}
                             </div>
                           </div>
-                          <p className="text-[10px] font-black text-gray-400 truncate uppercase tracking-tighter group-hover:text-black">{outfit.name}</p>
+                          <p className="text-[10px] text-gray-400 truncate uppercase tracking-tighter group-hover:text-black">{outfit.name}</p>
                         </div>
                       );
                     })}
                   </div>
                 ) : (
                   <div className="py-8 px-4 border border-dashed border-gray-100 rounded-3xl text-center">
-                    <p className="text-[10px] text-gray-300 font-black uppercase tracking-widest italic">No related outfits yet</p>
+                    <p className="text-[10px] text-gray-300 uppercase tracking-widest italic">暂无相关搭配</p>
                   </div>
                 )}
               </div>
@@ -151,12 +150,12 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
             {!isEditing && (
               <button 
                 onClick={() => {
-                  if(confirm('确定要从我的衣橱中移除这件珍藏吗？')) {
+                  if(confirm('确定要从我的衣橱中移除这件单品吗？')) {
                     onDelete(item.id);
                     onClose();
                   }
                 }}
-                className="w-full mt-12 py-4 text-red-500 text-[10px] font-black uppercase tracking-[0.3em] border border-red-50 rounded-2xl hover:bg-red-50 transition-colors"
+                className="w-full mt-12 py-4 text-red-500 text-[10px] uppercase tracking-[0.3em] border border-red-50 rounded-2xl hover:bg-red-50 transition-colors"
               >
                 移除此单品
               </button>

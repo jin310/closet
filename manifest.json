@@ -1,9 +1,9 @@
 {
-  "short_name": "衣橱",
-  "name": "Smart Closet - AI 智能衣橱",
+  "short_name": "我的衣橱",
+  "name": "Smart Closet - 我的智能衣橱",
   "icons": [
     {
-      "src": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=512&auto=format&fit=crop",
+      "src": "https://r.jina.ai/i/669f37be704043b483b28b6d089689a7",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

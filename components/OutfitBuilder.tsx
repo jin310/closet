@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ClosetItem, Outfit, OutfitItemPosition, MainCategory } from '../types.ts';
 import { CATEGORIES } from '../constants.ts';
@@ -79,7 +78,7 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
           {selectedItems.length === 0 && (
             <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-200">
               <span className="text-5xl mb-2 opacity-50">🧥</span>
-              <p className="text-xs font-black uppercase tracking-[0.2em]">挑选单品开始搭配</p>
+              <p className="text-xs font-normal uppercase tracking-[0.2em]">挑选单品开始搭配</p>
             </div>
           )}
         </div>
@@ -87,12 +86,12 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
 
       <div className="flex-1 flex flex-col overflow-hidden">
         <div className="px-6 py-3 border-b border-gray-50 bg-white">
-          <label className="text-[10px] font-black text-gray-300 uppercase tracking-widest block mb-1">搭配名称</label>
+          <label className="text-[10px] font-normal text-gray-300 uppercase tracking-widest block mb-1">搭配名称</label>
           <input 
             type="text"
             value={outfitName}
             onChange={(e) => setOutfitName(e.target.value)}
-            className="w-full text-sm font-bold text-black border-none outline-none focus:ring-0 placeholder-gray-100"
+            className="w-full text-sm font-normal text-black border-none outline-none focus:ring-0 placeholder-gray-100"
             placeholder="为这套穿搭起个名字..."
           />
         </div>
@@ -102,7 +101,7 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
             <button
               key={cat.type}
               onClick={() => setFilterCat(cat.type)}
-              className={`flex-1 min-w-[70px] py-3 text-xs font-bold border-b-2 transition-all ${
+              className={`flex-1 min-w-[70px] py-3 text-xs font-normal border-b-2 transition-all ${
                 filterCat === cat.type ? 'border-black text-black' : 'border-transparent text-gray-300'
               }`}
             >
@@ -141,7 +140,7 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
         <button
           onClick={handleSave}
           disabled={selectedItems.length === 0}
-          className="w-full bg-black text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest disabled:opacity-30 active:scale-[0.98] transition-all"
+          className="w-full bg-black text-white py-4 rounded-2xl text-xs font-normal uppercase tracking-widest disabled:opacity-30 active:scale-[0.98] transition-all"
         >
           保存这套搭配
         </button>
