@@ -1,5 +1,5 @@
 
-import { MainCategory, CategoryDefinition } from './types';
+import { MainCategory, CategoryDefinition } from './types.ts';
 
 export const CATEGORIES: CategoryDefinition[] = [
   {

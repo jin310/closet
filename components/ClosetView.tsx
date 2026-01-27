@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { MainCategory, ClosetItem, Outfit } from '../types';
-import { CATEGORIES } from '../constants';
-import { ItemDetailModal } from './ItemDetailModal';
+import { MainCategory, ClosetItem, Outfit } from '../types.ts';
+import { CATEGORIES } from '../constants.ts';
+import { ItemDetailModal } from './ItemDetailModal.tsx';
 
 interface ClosetViewProps {
   items: ClosetItem[];

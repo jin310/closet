@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
-import { ClosetView } from './components/ClosetView';
-import { OutfitBuilder } from './components/OutfitBuilder';
-import { OutfitGallery } from './components/OutfitGallery';
-import { ProfileView } from './components/ProfileView';
-import { AddItemModal } from './components/AddItemModal';
-import { ClosetItem, Outfit, MainCategory, BodyProfile } from './types';
-import { MOCK_ITEMS } from './constants';
+import React, { useState } from 'react';
+import { ClosetView } from './components/ClosetView.tsx';
+import { OutfitBuilder } from './components/OutfitBuilder.tsx';
+import { OutfitGallery } from './components/OutfitGallery.tsx';
+import { ProfileView } from './components/ProfileView.tsx';
+import { AddItemModal } from './components/AddItemModal.tsx';
+import { ClosetItem, Outfit, BodyProfile } from './types.ts';
+import { MOCK_ITEMS } from './constants.ts';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'closet' | 'outfit' | 'profile'>('closet');
