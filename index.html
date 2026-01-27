@@ -31,30 +31,35 @@
       --sat: env(safe-area-inset-top);
       --sab: env(safe-area-inset-bottom);
     }
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
       padding: 0;
       background-color: #ffffff;
+      overflow: hidden;
+      width: 100%;
+    }
+    body {
       font-family: "PingFang SC", "Hiragino Sans GB", "Heiti SC", "Microsoft YaHei", "WenQuanYi Micro Hei", sans-serif;
       font-weight: 400;
-      overflow: hidden;
       overscroll-behavior: none;
       -webkit-user-select: none;
       -webkit-tap-highlight-color: transparent;
       color: #333;
     }
     #root {
+      height: 100%;
       height: 100dvh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
     }
     #root:empty {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      background: #ffffff;
     }
     #root:empty::after {
       content: '正在开启衣橱';
@@ -70,7 +75,6 @@
       border-radius: 50%;
       animation: breathe 3s infinite ease-in-out;
       object-fit: cover;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
     @keyframes breathe {
       0%, 100% { transform: scale(1); opacity: 0.95; }
@@ -82,17 +86,26 @@
     }
     .safe-top { padding-top: var(--sat); }
     .safe-bottom { padding-bottom: var(--sab); }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
     
-    /* 严格全局禁用加粗，确保符合“萍方/平方”不加粗的要求 */
+    /* 严格全局禁用加粗 */
     * {
       font-weight: 400 !important;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
   </style>
 </head>
 <body>
   <div id="root">
-    <img src="https://r.jina.ai/i/669f37be704043b483b28b6d089689a7" alt="Logo" class="app-splash-icon" />
+    <div style="height:100%;display:flex;align-items:center;justify-content:center;">
+       <img src="https://r.jina.ai/i/669f37be704043b483b28b6d089689a7" alt="Logo" class="app-splash-icon" />
+    </div>
   </div>
   <script type="module" src="index.tsx"></script>
 </body>
