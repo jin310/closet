@@ -1,6 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { ClosetItem, MainCategory } from "../types";
+import { ClosetItem, MainCategory } from "../types.ts";
 
 // Create a helper to get fresh AI instance to avoid stale keys
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });

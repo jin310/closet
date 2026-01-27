@@ -1,13 +1,9 @@
 
-const CACHE_NAME = 'smart-closet-v3';
+const CACHE_NAME = 'smart-closet-v4';
 const ASSETS = [
-  './',
-  './index.html',
-  './index.tsx',
-  './App.tsx',
-  './manifest.json',
-  './types.ts',
-  './constants.ts'
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,9 +25,8 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // 仅在网络不可用时使用缓存
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    fetch(event.request).catch(() => caches.match(event.request))
   );
 });
