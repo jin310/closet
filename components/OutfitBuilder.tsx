@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ClosetItem, Outfit, OutfitItemPosition, MainCategory } from '../types';
-import { CATEGORIES } from '../constants';
+import { ClosetItem, Outfit, OutfitItemPosition, MainCategory } from '../types.ts';
+import { CATEGORIES } from '../constants.ts';
 
 interface OutfitBuilderProps {
   items: ClosetItem[];

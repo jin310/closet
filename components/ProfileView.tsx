@@ -1,7 +1,7 @@
 
 import React, { useState, useMemo } from 'react';
-import { BodyProfile, ClosetItem, MainCategory } from '../types';
-import { CATEGORIES } from '../constants';
+import { BodyProfile, ClosetItem, MainCategory } from '../types.ts';
+import { CATEGORIES } from '../constants.ts';
 
 interface ProfileViewProps {
   items: ClosetItem[];
