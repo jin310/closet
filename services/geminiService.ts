@@ -3,7 +3,8 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { ClosetItem, MainCategory } from "../types.ts";
 
 // Create a helper to get fresh AI instance to avoid stale keys
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
+// Fixed: Using process.env.API_KEY directly as a named parameter
+const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY! });
 
 export const analyzeClothingImage = async (base64Image: string) => {
   try {

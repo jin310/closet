@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Outfit, ClosetItem } from '../types';
+import { Outfit, ClosetItem } from '../types.ts';
 
 interface OutfitGalleryProps {
   outfits: Outfit[];
@@ -122,7 +122,7 @@ export const OutfitGallery: React.FC<OutfitGalleryProps> = ({
 
               return (
                 <div 
-                  key={outfit.id}
+                  key={outfit.id} 
                   draggable={draggedIndex !== null}
                   onDragStart={() => onDragStart(index)}
                   onDragOver={(e) => onDragOver(e, index)}

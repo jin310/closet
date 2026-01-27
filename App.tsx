@@ -127,6 +127,8 @@ const App: React.FC = () => {
             {activeTab === 'profile' && (
               <ProfileView 
                 items={closetItems} 
+                // Fix: Pass outfits state to ProfileView
+                outfits={outfits}
                 bodyProfile={bodyProfile} 
                 onUpdateBodyProfile={handleUpdateBodyProfile}
               />

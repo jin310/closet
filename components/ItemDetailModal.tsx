@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ClosetItem, MainCategory, Outfit } from '../types';
+import { ClosetItem, MainCategory, Outfit } from '../types.ts';
 
 interface ItemDetailModalProps {
   item: ClosetItem;
