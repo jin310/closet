@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- PWA 核心配置 -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="mobile-web-app-capable" content="yes">
+  
+  <!-- iOS 桌面图标与设置 -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="我的衣橱">
-  
-  <!-- iOS 桌面图标配置 -->
   <link rel="apple-touch-icon" href="https://r.jina.ai/i/669f37be704043b483b28b6d089689a7">
   
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#ffffff">
   <title>我的衣橱</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="importmap">
@@ -84,7 +87,7 @@
     .safe-bottom { padding-bottom: var(--sab); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     
-    /* 严格全局禁用加粗，确保符合“萍方/平方”不加粗的要求 */
+    /* 严格全局禁用加粗 */
     * {
       font-weight: 400 !important;
     }
