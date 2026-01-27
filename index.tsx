@@ -5,7 +5,7 @@ import App from './App.tsx';
 
 const rootElement = document.getElementById('root');
 
-async function mountApp() {
+const initApp = () => {
   if (!rootElement) return;
 
   try {
@@ -15,18 +15,18 @@ async function mountApp() {
         <App />
       </React.StrictMode>
     );
+    console.log("Wardrobe App: Render initiated successfully.");
   } catch (err: any) {
-    console.error("React Mount Failed:", err);
-    // 如果渲染失败，手动调用全局错误显示函数
+    console.error("React Mounting Crash:", err);
     if ((window as any).showError) {
       (window as any).showError(err.message || 'React 渲染引擎启动失败');
     }
   }
-}
+};
 
-// 确保在 DOM 准备就绪后执行
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', mountApp);
+// 确保在所有资源就绪后执行
+if (document.readyState === 'complete') {
+  initApp();
 } else {
-  mountApp();
+  window.addEventListener('load', initApp);
 }

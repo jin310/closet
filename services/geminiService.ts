@@ -1,15 +1,20 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { ClosetItem, MainCategory } from "../types.ts";
 
-// Create a helper to get fresh AI instance to avoid stale keys
-// Fixed: Using process.env.API_KEY directly as a named parameter
-const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY! });
+// 助手函数：确保 API Key 存在
+const getAI = () => {
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing API_KEY in environment");
+  }
+  return new GoogleGenAI({ apiKey });
+};
 
 export const analyzeClothingImage = async (base64Image: string) => {
   try {
     const ai = getAI();
     const data = base64Image.includes(',') ? base64Image.split(',')[1] : base64Image;
+    
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: [
@@ -31,8 +36,10 @@ export const analyzeClothingImage = async (base64Image: string) => {
         }
       }
     });
+    
     return JSON.parse(response.text || '{}');
   } catch (error) {
+    console.error("Gemini analysis error:", error);
     return null;
   }
 };
