@@ -10,7 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ffffff">
   
-  <!-- iOS Specific Meta Tags - Updated to latest standard -->
+  <!-- iOS Specific Meta Tags -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="我的衣橱">
@@ -32,16 +32,15 @@
       display: flex;
       flex-direction: column;
     }
-    /* Loading Placeholder */
     #root:empty::before {
-      content: '正在准备你的衣橱...';
+      content: '正在初始化衣橱系统...';
       display: flex;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      color: #ccc;
-      font-size: 14px;
-      font-weight: 600;
+      color: #999;
+      font-size: 13px;
+      font-weight: 500;
       letter-spacing: 0.1em;
     }
     ::-webkit-scrollbar {
@@ -58,11 +57,11 @@
 {
   "imports": {
     "react": "https://esm.sh/react@19.0.0",
+    "react/": "https://esm.sh/react@19.0.0/",
     "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
     "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0"
   }
 }
 </script>
@@ -70,17 +69,18 @@
 <body class="text-gray-900">
   <div id="root"></div>
   <script>
-    // 捕获全局错误并提醒，防止死机
-    window.onerror = function(msg, url, line) {
-      if (!document.getElementById('root').innerHTML) {
+    // 增强型错误捕获
+    window.addEventListener('unhandledrejection', function(event) {
+      console.error('Unhandled promise rejection:', event.reason);
+      if (!document.getElementById('root').childNodes.length) {
         document.getElementById('root').innerHTML = 
-          '<div style="padding:40px;text-align:center;color:#666;font-size:12px;">' +
-          '<p>加载失败，请尝试刷新页面</p>' +
-          '<code style="font-size:10px;opacity:0.5;">' + msg + '</code>' +
+          '<div style="padding:40px;text-align:center;color:#666;">' +
+          '<p style="font-weight:bold;">系统启动异常</p>' +
+          '<p style="font-size:12px;opacity:0.6;">可能是网络抖动导致模块加载中断</p>' +
+          '<button onclick="location.reload()" style="margin-top:20px;padding:8px 20px;background:#000;color:#fff;border-radius:20px;font-size:12px;">重试加载</button>' +
           '</div>';
       }
-      return false;
-    };
+    });
   </script>
 </body>
 </html>

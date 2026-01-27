@@ -1,18 +1,15 @@
 
 import React, { useState, useMemo } from 'react';
-// Added Outfit to imports
 import { BodyProfile, ClosetItem, MainCategory, Outfit } from '../types.ts';
 import { CATEGORIES } from '../constants.ts';
 
 interface ProfileViewProps {
   items: ClosetItem[];
-  // Added outfits to props interface
   outfits: Outfit[];
   bodyProfile: BodyProfile;
   onUpdateBodyProfile: (profile: BodyProfile) => void;
 }
 
-// Added outfits to destructured props
 export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyProfile, onUpdateBodyProfile }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [localProfile, setLocalProfile] = useState<BodyProfile>(bodyProfile);
@@ -74,7 +71,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
           </button>
         </div>
         <h2 className="text-xl font-black text-black">我的衣橱主理人</h2>
-        <p className="text-gray-300 text-xs mt-1 italic tracking-widest font-bold">WARDROSER CURATOR</p>
+        <p className="text-gray-300 text-xs mt-1 italic tracking-widest font-bold">WARDROBE CURATOR</p>
         
         <div className="grid grid-cols-2 gap-4 mt-8 w-full">
           <div className="bg-white p-4 rounded-2xl text-center border border-gray-100 shadow-sm">
@@ -82,7 +79,6 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
             <p className="text-[10px] text-gray-300 uppercase tracking-widest font-black">单品总数</p>
           </div>
           <div className="bg-white p-4 rounded-2xl text-center border border-gray-100 shadow-sm">
-            {/* Fix: outfits is now available via props */}
             <p className="text-2xl font-black text-black">{outfits.length || 0}</p>
             <p className="text-[10px] text-gray-300 uppercase tracking-widest font-black">灵感搭配</p>
           </div>
