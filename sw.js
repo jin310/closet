@@ -1,5 +1,5 @@
 
-// Version 5: Pure Bypass
+// Version 6: Deep Reset
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
@@ -15,6 +15,6 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Directly fetch from network without cache to debug 404/blank screen
+  // 强制走网络，不使用缓存
   event.respondWith(fetch(event.request));
 });
