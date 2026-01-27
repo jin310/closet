@@ -1,0 +1,7 @@
+{
+  "name": "SmartCloset AI",
+  "description": "A premium wardrobe management and outfit coordination app with AI-powered styling suggestions.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
