@@ -55,7 +55,7 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
 
   return (
     <div className="flex flex-col h-full bg-white overflow-hidden">
-      <div className="relative h-[45%] bg-white overflow-hidden border-b border-gray-100">
+      <div className="relative h-[45%] bg-white overflow-hidden border-b border-gray-50">
         <div ref={canvasRef} className="absolute inset-0">
           {selectedItems.map(item => {
             const pos = positions.find(p => p.itemId === item.id);
@@ -86,18 +86,18 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
       </div>
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <div className="px-6 py-3 border-b border-gray-100 bg-white">
+        <div className="px-6 py-3 border-b border-gray-50 bg-white">
           <label className="text-[10px] font-black text-gray-300 uppercase tracking-widest block mb-1">搭配名称</label>
           <input 
             type="text"
             value={outfitName}
             onChange={(e) => setOutfitName(e.target.value)}
-            className="w-full text-sm font-bold text-black border-none outline-none focus:ring-0 placeholder-gray-200"
+            className="w-full text-sm font-bold text-black border-none outline-none focus:ring-0 placeholder-gray-100"
             placeholder="为这套穿搭起个名字..."
           />
         </div>
 
-        <div className="flex border-b border-gray-100 bg-white overflow-x-auto scrollbar-hide">
+        <div className="flex border-b border-gray-50 bg-white overflow-x-auto scrollbar-hide">
           {CATEGORIES.map(cat => (
             <button
               key={cat.type}
@@ -120,8 +120,8 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
                 <div
                   key={item.id}
                   onClick={() => toggleItem(item)}
-                  className={`aspect-square rounded-2xl overflow-hidden relative border-2 transition-all active:scale-90 ${
-                    isSelected ? 'border-black shadow-md' : 'border-gray-50'
+                  className={`aspect-square rounded-xl overflow-hidden relative border transition-all active:scale-90 ${
+                    isSelected ? 'border-black shadow-sm' : 'border-gray-100'
                   }`}
                 >
                   <img src={item.imageUrl} className="w-full h-full object-cover" alt={item.name} />
@@ -137,13 +137,13 @@ export const OutfitBuilder: React.FC<OutfitBuilderProps> = ({ items, onSave }) =
         </div>
       </div>
 
-      <div className="p-4 border-t border-gray-100 bg-white">
+      <div className="p-4 border-t border-gray-50 bg-white">
         <button
           onClick={handleSave}
           disabled={selectedItems.length === 0}
-          className="w-full bg-black text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl disabled:opacity-50 active:scale-[0.98]"
+          className="w-full bg-black text-white py-4 rounded-2xl text-xs font-black uppercase tracking-widest disabled:opacity-30 active:scale-[0.98] transition-all"
         >
-          保存这套穿搭
+          保存这套搭配
         </button>
       </div>
     </div>
