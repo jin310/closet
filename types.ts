@@ -20,6 +20,7 @@ export interface ClosetItem {
   purchaseDate?: string;
   purchaseChannel?: string;
   size?: string;
+  season?: string; // 新增：季节 (春, 夏, 秋, 冬, 四季)
   tags?: string[];
   createdAt: number;
 }

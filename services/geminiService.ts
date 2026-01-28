@@ -1,7 +1,6 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 
-// 助手函数：确保 API Key 存在
 const getAI = () => {
   const apiKey = process.env.API_KEY;
   if (!apiKey) {
@@ -19,7 +18,7 @@ export const analyzeClothingImage = async (base64Image: string) => {
       model: 'gemini-3-flash-preview',
       contents: [
         { inlineData: { data: data, mimeType: 'image/jpeg' } },
-        { text: "Analyze garment in detail. Return JSON with category, color, style and a catchy product name." }
+        { text: "Detailed garment analysis. Detect: category, color, style, season (Spring, Summer, Autumn, Winter, All-season), and suggested name. Return JSON." }
       ],
       config: {
         responseMimeType: "application/json",
@@ -30,9 +29,10 @@ export const analyzeClothingImage = async (base64Image: string) => {
             subCategory: { type: Type.STRING },
             color: { type: Type.STRING },
             style: { type: Type.STRING },
+            season: { type: Type.STRING },
             suggestedName: { type: Type.STRING }
           },
-          required: ["mainCategory", "subCategory", "color", "style", "suggestedName"]
+          required: ["mainCategory", "subCategory", "color", "style", "season", "suggestedName"]
         }
       }
     });

@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ClosetItem, MainCategory, Outfit } from '../types.ts';
 
@@ -11,7 +12,6 @@ interface ItemDetailModalProps {
   onViewOutfit: (id: string) => void;
 }
 
-// 辅助组件移出到外部，确保编辑时输入框不会失去焦点
 const DetailRow = ({ 
   label, 
   value, 
@@ -33,21 +33,11 @@ const DetailRow = ({
     <label className="text-[10px] text-gray-400 uppercase tracking-[0.2em] block mb-1">{label}</label>
     {isEditing ? (
       field === 'mainCategory' ? (
-        <select 
-          value={editedItem[field] as string}
-          onChange={e => onEdit({...editedItem, [field]: e.target.value as MainCategory})}
-          className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-black h-10"
-        >
+        <select value={editedItem[field] as string} onChange={e => onEdit({...editedItem, [field]: e.target.value as MainCategory})} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-black h-10">
           {Object.values(MainCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
       ) : (
-        <input 
-          type={type}
-          value={(editedItem[field] as string) || ''}
-          onChange={e => onEdit({...editedItem, [field]: e.target.value})}
-          className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-black text-black"
-          placeholder={`请输入${label}`}
-        />
+        <input type={type} value={(editedItem[field] as string) || ''} onChange={e => onEdit({...editedItem, [field]: e.target.value})} className="w-full bg-gray-50 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-black text-black" placeholder={`请输入${label}`} />
       )
     ) : (
       <p className="text-sm text-black font-normal">{value || '--'}</p>
@@ -66,45 +56,19 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
     setIsEditing(false);
   };
 
-  const handleOutfitClick = (outfitId: string) => {
-    onClose();
-    onViewOutfit(outfitId);
-  };
-
-  const getOutfitPreviewItems = (outfit: Outfit) => {
-    return items.filter(i => outfit.items.includes(i.id));
-  };
+  const SEASONS = ['春', '夏', '秋', '冬', '四季'];
 
   return (
     <div className="fixed inset-0 z-[70] flex flex-col bg-white animate-fade-in">
       <div className="safe-top bg-white/90 backdrop-blur-xl border-b border-gray-50 sticky top-0 z-50">
         <div className="px-4 h-14 flex justify-between items-center">
-          <button 
-            onClick={onClose} 
-            className="w-10 h-10 flex items-center justify-start text-gray-400 active:opacity-50"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M15 18l-6-6 6-6" />
-            </svg>
-          </button>
-          
+          <button onClick={onClose} className="w-10 h-10 flex items-center justify-start text-gray-400"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg></button>
           <h2 className="text-sm font-normal tracking-[0.15em] text-black">单品详情</h2>
-          
           <div className="w-10 flex justify-end">
             {!isEditing ? (
-              <button 
-                onClick={() => setIsEditing(true)}
-                className="text-[11px] text-black tracking-widest active:opacity-50"
-              >
-                编辑
-              </button>
+              <button onClick={() => setIsEditing(true)} className="text-[11px] text-black tracking-widest">编辑</button>
             ) : (
-              <button 
-                onClick={() => setIsEditing(false)}
-                className="text-[11px] text-gray-400 tracking-widest active:opacity-50"
-              >
-                取消
-              </button>
+              <button onClick={() => setIsEditing(false)} className="text-[11px] text-gray-400 tracking-widest">取消</button>
             )}
           </div>
         </div>
@@ -122,28 +86,21 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
               <h3 className="text-xl text-black tracking-tight leading-tight">{item.name}</h3>
               <div className="flex items-center gap-2 mt-2">
                 <span className="bg-black text-white text-[9px] px-2 py-0.5 rounded-full uppercase tracking-tighter">{item.mainCategory}</span>
-                <span className="text-gray-300 text-[10px] uppercase tracking-[0.1em]">{item.subCategory}</span>
+                <span className="text-gray-300 text-[10px] uppercase tracking-[0.1em]">{item.season || '四季'} · {item.subCategory}</span>
               </div>
             </div>
           )}
           
-          <DetailRow 
-            label="单品名称" 
-            value={item.name} 
-            field="name" 
-            isEditing={isEditing} 
-            editedItem={editedItem} 
-            onEdit={setEditedItem} 
-          />
+          <DetailRow label="单品名称" value={item.name} field="name" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
           
           <div className="grid grid-cols-2 gap-x-6">
             <DetailRow label="主分类" value={item.mainCategory} field="mainCategory" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
-            <DetailRow label="细分类" value={item.subCategory} field="subCategory" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
+            <DetailRow label="季节" value={item.season} field="season" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
           </div>
-          
+
           <div className="grid grid-cols-2 gap-x-6">
+            <DetailRow label="细分类" value={item.subCategory} field="subCategory" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
             <DetailRow label="颜色" value={item.color} field="color" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
-            <DetailRow label="风格" value={item.style} field="style" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
           </div>
 
           <div className="grid grid-cols-2 gap-x-6">
@@ -151,7 +108,10 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
             <DetailRow label="尺码" value={item.size} field="size" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
           </div>
 
-          <DetailRow label="参考价格" value={item.price ? `¥ ${item.price}` : undefined} field="price" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} />
+          <div className="grid grid-cols-2 gap-x-6">
+            <DetailRow label="参考价格" value={item.price ? `¥ ${item.price}` : undefined} field="price" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} type="number" />
+            <DetailRow label="购买日期" value={item.purchaseDate} field="purchaseDate" isEditing={isEditing} editedItem={editedItem} onEdit={setEditedItem} type="date" />
+          </div>
 
           {!isEditing && (
             <div className="mt-12">
@@ -159,50 +119,30 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
                 <h3 className="text-[10px] text-gray-300 uppercase tracking-[0.2em] whitespace-nowrap">灵感穿搭</h3>
                 <div className="h-[1px] bg-gray-50 flex-1"></div>
               </div>
-              
               {relatedOutfits.length > 0 ? (
                 <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-                  {relatedOutfits.map(outfit => {
-                    const previewItems = getOutfitPreviewItems(outfit);
-                    return (
-                      <div 
-                        key={outfit.id} 
-                        onClick={() => handleOutfitClick(outfit.id)}
-                        className="min-w-[140px] flex flex-col gap-2 cursor-pointer active:opacity-70 transition-all"
-                      >
-                        <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 p-0.5">
-                          <div className="grid grid-cols-2 grid-rows-2 gap-0.5 w-full h-full">
-                            {previewItems.slice(0, 4).map(pi => (
-                              <img key={pi.id} src={pi.imageUrl} className="w-full h-full object-cover" />
-                            ))}
-                          </div>
+                  {relatedOutfits.map(outfit => (
+                    <div key={outfit.id} onClick={() => { onClose(); onViewOutfit(outfit.id); }} className="min-w-[140px] flex flex-col gap-2 cursor-pointer active:opacity-70 transition-all">
+                      <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 p-0.5">
+                        <div className="grid grid-cols-2 grid-rows-2 gap-0.5 w-full h-full">
+                          {items.filter(i => outfit.items.includes(i.id)).slice(0, 4).map(pi => (
+                            <img key={pi.id} src={pi.imageUrl} className="w-full h-full object-cover" />
+                          ))}
                         </div>
-                        <p className="text-[10px] text-gray-400 truncate tracking-tight">{outfit.name}</p>
                       </div>
-                    );
-                  })}
+                      <p className="text-[10px] text-gray-400 truncate tracking-tight">{outfit.name}</p>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <div className="py-10 border border-dashed border-gray-100 rounded-3xl text-center">
-                  <p className="text-[10px] text-gray-300 uppercase tracking-widest italic">暂无相关搭配</p>
-                </div>
+                <div className="py-10 border border-dashed border-gray-100 rounded-3xl text-center"><p className="text-[10px] text-gray-300 uppercase tracking-widest italic">暂无相关搭配</p></div>
               )}
             </div>
           )}
 
           {!isEditing && (
             <div className="pt-10">
-              <button 
-                onClick={() => {
-                  if(confirm('确定要从衣橱中永久移除这件单品吗？')) {
-                    onDelete(item.id);
-                    onClose();
-                  }
-                }}
-                className="w-full py-4 text-red-400 text-[11px] uppercase tracking-[0.2em] border border-red-50 rounded-2xl active:bg-red-50 transition-colors"
-              >
-                移除此单品
-              </button>
+              <button onClick={() => { if(confirm('确定要从衣橱中永久移除这件单品吗？')) { onDelete(item.id); onClose(); } }} className="w-full py-4 text-red-400 text-[11px] uppercase tracking-[0.2em] border border-red-50 rounded-2xl active:bg-red-50 transition-colors">移除此单品</button>
             </div>
           )}
         </div>
@@ -210,23 +150,13 @@ export const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ item, outfits,
 
       {isEditing && (
         <div className="safe-bottom fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-md border-t border-gray-50 z-[90]">
-          <button
-            onClick={handleSave}
-            className="w-full bg-black text-white py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/10 active:scale-[0.98] transition-all"
-          >
-            保存修改
-          </button>
+          <button onClick={handleSave} className="w-full bg-black text-white py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/10 active:scale-[0.98] transition-all">保存修改</button>
         </div>
       )}
 
       <style>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: scale(1.05); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in {
-          animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        @keyframes fade-in { from { opacity: 0; transform: scale(1.05); } to { opacity: 1; transform: scale(1); } }
+        .animate-fade-in { animation: fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
       `}</style>
     </div>
   );
