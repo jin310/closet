@@ -1,12 +1,25 @@
 import React, { useState, useRef } from 'react';
 import { ClosetItem, MainCategory } from '../types.ts';
 import { analyzeClothingImage } from '../services/geminiService.ts';
-import { CATEGORIES } from '../constants.ts';
 
 interface AddItemModalProps {
   onClose: () => void;
   onAdd: (item: ClosetItem) => void;
 }
+
+// 将子组件移到主组件外部，防止重新渲染时丢失焦点
+const InputField = ({ label, value, onChange, placeholder, type = "text" }: { label: string, value: string | undefined, onChange: (v: string) => void, placeholder?: string, type?: string }) => (
+  <div className="space-y-1.5 border-b border-gray-50 py-3 group">
+    <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">{label}</label>
+    <input 
+      type={type}
+      value={value || ''} 
+      onChange={e => onChange(e.target.value)} 
+      placeholder={placeholder} 
+      className="w-full text-sm font-normal text-black outline-none placeholder:text-gray-200 bg-transparent py-1"
+    />
+  </div>
+);
 
 export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) => {
   const [image, setImage] = useState<string | null>(null);
@@ -79,19 +92,6 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
     onAdd(newItem);
   };
 
-  const InputField = ({ label, value, onChange, placeholder, type = "text" }: { label: string, value: string | undefined, onChange: (v: string) => void, placeholder?: string, type?: string }) => (
-    <div className="space-y-1.5 border-b border-gray-50 py-3">
-      <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">{label}</label>
-      <input 
-        type={type}
-        value={value || ''} 
-        onChange={e => onChange(e.target.value)} 
-        placeholder={placeholder} 
-        className="w-full text-sm font-normal text-black outline-none placeholder:text-gray-200 bg-transparent"
-      />
-    </div>
-  );
-
   return (
     <div className="fixed inset-0 z-[80] flex flex-col bg-white animate-fade-in overflow-hidden">
       {/* 沉浸式头部 */}
@@ -99,7 +99,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
         <div className="px-4 h-14 flex justify-between items-center">
           <button 
             onClick={onClose} 
-            className="text-gray-400 text-xs tracking-widest px-2"
+            className="text-gray-400 text-xs tracking-widest px-2 active:opacity-50"
           >
             取消
           </button>
@@ -107,14 +107,14 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
           <button 
             onClick={handleSubmit} 
             disabled={!image || isAnalyzing || !formData.name}
-            className="text-black text-xs font-normal tracking-widest px-2 disabled:opacity-20"
+            className="text-black text-xs font-normal tracking-widest px-2 disabled:opacity-20 active:opacity-50"
           >
             完成
           </button>
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-32">
+      <div className="flex-1 overflow-y-auto pb-40">
         {/* 图片上传区域 */}
         <div 
           onClick={() => fileInputRef.current?.click()} 
@@ -160,7 +160,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
               <select 
                 value={formData.mainCategory} 
                 onChange={e => setFormData({...formData, mainCategory: e.target.value as MainCategory})} 
-                className="w-full text-sm bg-transparent outline-none"
+                className="w-full text-sm bg-transparent outline-none py-1 h-8"
               >
                 {Object.values(MainCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
@@ -239,7 +239,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
       </div>
 
       {/* 固定底部按钮 */}
-      <div className="safe-bottom fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md">
+      <div className="safe-bottom fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-md border-t border-gray-50 z-[90]">
         <button
           onClick={handleSubmit}
           disabled={!image || isAnalyzing || !formData.name}

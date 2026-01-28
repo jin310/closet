@@ -64,21 +64,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full max-w-md mx-auto bg-white relative overflow-hidden">
+    <div className="flex flex-col h-full w-full bg-white relative overflow-hidden">
       {/* Header */}
       <header className="safe-top bg-white/80 backdrop-blur-md z-50 border-b border-gray-50 flex-shrink-0">
-        <div className="px-6 h-14 flex justify-between items-center">
+        <div className="max-w-screen-xl mx-auto px-6 h-14 flex justify-between items-center">
           <div className="flex items-center gap-2">
             {!isBuildingOutfit && (
               <div className="w-8 h-8 flex items-center justify-center bg-pink-50 rounded-full border border-pink-100 shadow-sm overflow-hidden">
-                <svg viewBox="0 0 100 100" className="w-6 h-6">
-                  <rect x="25" y="20" width="50" height="65" rx="5" fill="#FFB6C1" opacity="0.3" />
-                  <rect x="25" y="20" width="50" height="65" rx="5" stroke="#FF69B4" strokeWidth="2" fill="none" />
-                  <line x1="50" y1="20" x2="50" y2="85" stroke="#FF69B4" strokeWidth="2" />
-                  <circle cx="45" cy="52.5" r="2" fill="#FF69B4" />
-                  <circle cx="55" cy="52.5" r="2" fill="#FF69B4" />
-                  <path d="M35 15 L65 15" stroke="#FF69B4" strokeWidth="2" strokeLinecap="round" />
-                </svg>
+                <img src="https://r.jina.ai/i/67be9267104b46c8bc591a27e0be3895" className="w-full h-full object-cover" alt="Closet Icon" />
               </div>
             )}
             <h1 className="text-sm tracking-[0.1em] text-black">
@@ -109,48 +102,50 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-1 overflow-hidden relative">
-        {isBuildingOutfit ? (
-          <OutfitBuilder items={closetItems} onSave={handleSaveOutfit} />
-        ) : (
-          <div className="h-full overflow-hidden">
-            {activeTab === 'closet' && (
-              <ClosetView 
-                items={closetItems} 
-                outfits={outfits}
-                onAddItem={() => setShowAddModal(true)} 
-                onUpdateItem={handleUpdateItem}
-                onDeleteItem={handleDeleteItem}
-                onViewOutfit={handleViewOutfit}
-              />
-            )}
-            {activeTab === 'outfit' && (
-              <OutfitGallery 
-                outfits={outfits} 
-                items={closetItems}
-                initialOutfitId={focusedOutfitId}
-                onClearFocusedOutfit={() => setFocusedOutfitId(null)}
-                onCreateNew={() => setIsBuildingOutfit(true)}
-                onUpdateOutfit={handleUpdateOutfit}
-                onReorderOutfits={handleReorderOutfits}
-                onDeleteOutfit={handleDeleteOutfit}
-              />
-            )}
-            {activeTab === 'profile' && (
-              <ProfileView 
-                items={closetItems} 
-                outfits={outfits}
-                bodyProfile={bodyProfile}
-                onUpdateBodyProfile={handleUpdateBodyProfile}
-              />
-            )}
-          </div>
-        )}
+        <div className="h-full w-full max-w-screen-xl mx-auto">
+          {isBuildingOutfit ? (
+            <OutfitBuilder items={closetItems} onSave={handleSaveOutfit} />
+          ) : (
+            <div className="h-full overflow-hidden">
+              {activeTab === 'closet' && (
+                <ClosetView 
+                  items={closetItems} 
+                  outfits={outfits}
+                  onAddItem={() => setShowAddModal(true)} 
+                  onUpdateItem={handleUpdateItem}
+                  onDeleteItem={handleDeleteItem}
+                  onViewOutfit={handleViewOutfit}
+                />
+              )}
+              {activeTab === 'outfit' && (
+                <OutfitGallery 
+                  outfits={outfits} 
+                  items={closetItems}
+                  initialOutfitId={focusedOutfitId}
+                  onClearFocusedOutfit={() => setFocusedOutfitId(null)}
+                  onCreateNew={() => setIsBuildingOutfit(true)}
+                  onUpdateOutfit={handleUpdateOutfit}
+                  onReorderOutfits={handleReorderOutfits}
+                  onDeleteOutfit={handleDeleteOutfit}
+                />
+              )}
+              {activeTab === 'profile' && (
+                <ProfileView 
+                  items={closetItems} 
+                  outfits={outfits}
+                  bodyProfile={bodyProfile}
+                  onUpdateBodyProfile={handleUpdateBodyProfile}
+                />
+              )}
+            </div>
+          )}
+        </div>
       </main>
 
-      {/* Navigation - Icon Only & Bottom Extended */}
+      {/* Navigation */}
       {!isBuildingOutfit && (
         <nav className="bg-white/95 backdrop-blur-md border-t border-gray-50 flex-shrink-0 safe-bottom">
-          <div className="flex justify-around items-center h-16">
+          <div className="max-w-screen-sm mx-auto flex justify-around items-center h-16">
             <button 
               onClick={() => setActiveTab('closet')}
               className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'closet' ? 'text-black' : 'text-gray-300'}`}
