@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { ClosetView } from './components/ClosetView.tsx';
 import { OutfitBuilder } from './components/OutfitBuilder.tsx';
 import { OutfitGallery } from './components/OutfitGallery.tsx';
@@ -10,18 +11,50 @@ import { MOCK_ITEMS } from './constants.ts';
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'closet' | 'outfit' | 'profile'>('closet');
   const [isBuildingOutfit, setIsBuildingOutfit] = useState(false);
-  const [closetItems, setClosetItems] = useState<ClosetItem[]>(MOCK_ITEMS);
-  const [outfits, setOutfits] = useState<Outfit[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [focusedOutfitId, setFocusedOutfitId] = useState<string | null>(null);
-  const [bodyProfile, setBodyProfile] = useState<BodyProfile>({
-    height: '175',
-    weight: '65',
-    shoulder: '42',
-    chest: '90',
-    waist: '72',
-    hips: '92'
+
+  // --- 数据持久化逻辑 ---
+  
+  // 初始化单品：优先从本地存储读取
+  const [closetItems, setClosetItems] = useState<ClosetItem[]>(() => {
+    const saved = localStorage.getItem('closet_items_v1');
+    return saved ? JSON.parse(saved) : MOCK_ITEMS;
   });
+
+  // 初始化穿搭：优先从本地存储读取
+  const [outfits, setOutfits] = useState<Outfit[]>(() => {
+    const saved = localStorage.getItem('outfits_v1');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // 初始化身材档案：优先从本地存储读取
+  const [bodyProfile, setBodyProfile] = useState<BodyProfile>(() => {
+    const saved = localStorage.getItem('body_profile_v1');
+    return saved ? JSON.parse(saved) : {
+      height: '175',
+      weight: '65',
+      shoulder: '42',
+      chest: '90',
+      waist: '72',
+      hips: '92'
+    };
+  });
+
+  // 监听数据变化并自动保存
+  useEffect(() => {
+    localStorage.setItem('closet_items_v1', JSON.stringify(closetItems));
+  }, [closetItems]);
+
+  useEffect(() => {
+    localStorage.setItem('outfits_v1', JSON.stringify(outfits));
+  }, [outfits]);
+
+  useEffect(() => {
+    localStorage.setItem('body_profile_v1', JSON.stringify(bodyProfile));
+  }, [bodyProfile]);
+
+  // --- 业务处理逻辑 ---
 
   const handleAddItem = (item: ClosetItem) => {
     setClosetItems([item, ...closetItems]);
@@ -147,7 +180,7 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Navigation - Icon Only & Bottom Extended */}
+      {/* Navigation */}
       {!isBuildingOutfit && (
         <nav className="bg-white/95 backdrop-blur-md border-t border-gray-50 flex-shrink-0 safe-bottom">
           <div className="flex justify-around items-center h-16">
