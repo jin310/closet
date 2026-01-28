@@ -147,30 +147,27 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Navigation - 关键修复：让背景延伸到安全区域 */}
+      {/* Navigation - Icon Only & Bottom Extended */}
       {!isBuildingOutfit && (
         <nav className="bg-white/95 backdrop-blur-md border-t border-gray-50 flex-shrink-0 safe-bottom">
           <div className="flex justify-around items-center h-16">
             <button 
               onClick={() => setActiveTab('closet')}
-              className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'closet' ? 'text-black' : 'text-gray-300'}`}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'closet' ? 'text-black' : 'text-gray-300'}`}
             >
-              <span className="text-xl">{activeTab === 'closet' ? '🧥' : '📁'}</span>
-              <span className="text-[10px] uppercase tracking-widest">衣橱</span>
+              <span className="text-2xl mb-1">{activeTab === 'closet' ? '🧥' : '📁'}</span>
             </button>
             <button 
               onClick={() => setActiveTab('outfit')}
-              className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'outfit' ? 'text-black' : 'text-gray-300'}`}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'outfit' ? 'text-black' : 'text-gray-300'}`}
             >
-              <span className="text-xl">{activeTab === 'outfit' ? '✨' : '🎨'}</span>
-              <span className="text-[10px] uppercase tracking-widest">搭配</span>
+              <span className="text-2xl mb-1">{activeTab === 'outfit' ? '✨' : '🎨'}</span>
             </button>
             <button 
               onClick={() => setActiveTab('profile')}
-              className={`flex flex-col items-center gap-1 transition-all ${activeTab === 'profile' ? 'text-black' : 'text-gray-300'}`}
+              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'text-black' : 'text-gray-300'}`}
             >
-              <span className="text-xl">{activeTab === 'profile' ? '👤' : '🔘'}</span>
-              <span className="text-[10px] uppercase tracking-widest">我的</span>
+              <span className="text-2xl mb-1">{activeTab === 'profile' ? '👤' : '🔘'}</span>
             </button>
           </div>
         </nav>
