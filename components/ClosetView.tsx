@@ -32,7 +32,7 @@ export const ClosetView: React.FC<ClosetViewProps> = ({ items, outfits, onAddIte
 
   return (
     <div className="flex flex-col h-full bg-white">
-      {/* Category Stats Summary */}
+      {/* Category Stats Summary - 新增统计概览 */}
       <div className="px-6 py-4 bg-gray-50/50">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-[10px] text-gray-400 tracking-[0.2em] uppercase">衣橱分布统计</h2>
@@ -73,7 +73,7 @@ export const ClosetView: React.FC<ClosetViewProps> = ({ items, outfits, onAddIte
       </div>
 
       {/* Category Tabs */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-gray-50 px-4 py-3 overflow-x-auto whitespace-nowrap scrollbar-hide">
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-50 px-4 py-3 overflow-x-auto whitespace-nowrap scrollbar-hide">
         <div className="flex gap-2 items-center">
           <button 
             onClick={() => setSelectedMain('ALL')}
@@ -113,7 +113,7 @@ export const ClosetView: React.FC<ClosetViewProps> = ({ items, outfits, onAddIte
         </div>
       </div>
 
-      {/* Grid Content - 升级为响应式网格 */}
+      {/* Grid Content */}
       <div className="flex-1 overflow-y-auto p-4 pb-24 bg-white">
         {filteredItems.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-64 text-gray-200">
@@ -127,20 +127,20 @@ export const ClosetView: React.FC<ClosetViewProps> = ({ items, outfits, onAddIte
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {filteredItems.map(item => (
               <div 
                 key={item.id} 
                 onClick={() => setSelectedItem(item)}
-                className="group relative bg-white rounded-2xl overflow-hidden aspect-[3/4] border border-gray-50 cursor-pointer hover:shadow-xl hover:shadow-black/[0.02] transition-all"
+                className="group relative bg-white rounded-xl overflow-hidden aspect-[3/4] border border-gray-50 cursor-pointer active:scale-98 transition-all"
               >
                 <img 
                   src={item.imageUrl} 
                   alt={item.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-sm p-3 flex flex-col justify-end translate-y-1 group-hover:translate-y-0 transition-transform">
-                  <p className="text-black text-[10px] font-medium truncate leading-tight">{item.name}</p>
+                <div className="absolute inset-x-0 bottom-0 bg-white/90 backdrop-blur-sm p-2 flex flex-col justify-end">
+                  <p className="text-black text-[10px] truncate leading-tight">{item.name}</p>
                   <p className="text-gray-400 text-[8px] mt-0.5">{item.subCategory}</p>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -70,16 +71,15 @@
       animation: pulse 2s infinite ease-in-out;
     }
     .app-splash-icon {
-      width: 120px;
-      height: 120px;
-      border-radius: 40px;
-      object-fit: cover;
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
       animation: breathe 3s infinite ease-in-out;
-      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+      object-fit: cover;
     }
     @keyframes breathe {
       0%, 100% { transform: scale(1); opacity: 0.95; }
-      50% { transform: scale(1.05); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 1; }
     }
     @keyframes pulse {
       0%, 100% { opacity: 0.3; }
@@ -105,7 +105,7 @@
 <body>
   <div id="root">
     <div style="height:100%;display:flex;align-items:center;justify-content:center;">
-       <img src="https://r.jina.ai/i/67be9267104b46c8bc591a27e0be3895" class="app-splash-icon" alt="Closet Logo" />
+       <img src="https://r.jina.ai/i/67be9267104b46c8bc591a27e0be3895" alt="Logo" class="app-splash-icon" />
     </div>
   </div>
   <script type="module" src="index.tsx"></script>
