@@ -9,7 +9,7 @@ import { ClosetItem, Outfit, BodyProfile } from './types.ts';
 import { MOCK_ITEMS } from './constants.ts';
 
 const STORAGE_VERSION = 'v2';
-const PREVIOUS_VERSION = 'v1';
+const LEGACY_VERSIONS = ['v1', '']; // 按优先级排序的历史版本后缀
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'closet' | 'outfit' | 'profile'>('closet');
@@ -17,23 +17,32 @@ const App: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [focusedOutfitId, setFocusedOutfitId] = useState<string | null>(null);
 
+  /**
+   * 增强型迁移加载逻辑
+   */
   const getInitialDataWithMigration = <T,>(keyPrefix: string, defaultValue: T): T => {
     try {
       const currentKey = `${keyPrefix}_${STORAGE_VERSION}`;
-      const previousKey = `${keyPrefix}_${PREVIOUS_VERSION}`;
       
+      // 1. 优先尝试当前版本
       const savedCurrent = localStorage.getItem(currentKey);
       if (savedCurrent) {
         return JSON.parse(savedCurrent);
       }
 
-      const savedPrevious = localStorage.getItem(previousKey);
-      if (savedPrevious) {
-        console.log(`自动迁移数据: ${previousKey} -> ${currentKey}`);
-        return JSON.parse(savedPrevious);
+      // 2. 依次尝试历史版本并准备迁移
+      for (const version of LEGACY_VERSIONS) {
+        const legacyKey = version ? `${keyPrefix}_${version}` : keyPrefix;
+        const savedLegacy = localStorage.getItem(legacyKey);
+        if (savedLegacy) {
+          console.log(`检测到旧数据，正在从 ${legacyKey} 迁移到 ${currentKey}...`);
+          const data = JSON.parse(savedLegacy);
+          // 这里不删除旧数据，等待 useEffect 确认保存新版本后再统一清理
+          return data;
+        }
       }
     } catch (e) {
-      console.warn(`读取数据失败 (${keyPrefix})，已重置为默认值`, e);
+      console.warn(`迁移数据失败 (${keyPrefix})，使用默认值`, e);
     }
     return defaultValue;
   };
@@ -57,13 +66,23 @@ const App: React.FC = () => {
     })
   );
 
-  // 安全保存函数，防止 QuotaExceededError 崩溃
-  const safeSave = (key: string, data: any) => {
+  // 安全保存并清理旧数据的函数
+  const safeSaveAndCleanup = (keyPrefix: string, data: any) => {
+    const currentKey = `${keyPrefix}_${STORAGE_VERSION}`;
     try {
-      localStorage.setItem(key, JSON.stringify(data));
+      localStorage.setItem(currentKey, JSON.stringify(data));
+      
+      // 保存成功后，清理该前缀下的所有旧版本键值，释放 iOS 空间
+      LEGACY_VERSIONS.forEach(version => {
+        const legacyKey = version ? `${keyPrefix}_${version}` : keyPrefix;
+        if (localStorage.getItem(legacyKey)) {
+          localStorage.removeItem(legacyKey);
+          console.log(`清理旧版本数据成功: ${legacyKey}`);
+        }
+      });
     } catch (e) {
       if (e instanceof DOMException && e.name === 'QuotaExceededError') {
-        alert('衣橱空间已满（浏览器限制），请尝试删除不需要的旧单品。');
+        alert('衣橱空间已满（iOS 存储限制），请删除部分旧单品以继续使用。');
       } else {
         console.error('保存数据时出错', e);
       }
@@ -71,16 +90,26 @@ const App: React.FC = () => {
   };
 
   useEffect(() => {
-    safeSave(`closet_items_${STORAGE_VERSION}`, closetItems);
+    safeSaveAndCleanup('closet_items', closetItems);
   }, [closetItems]);
 
   useEffect(() => {
-    safeSave(`outfits_${STORAGE_VERSION}`, outfits);
+    safeSaveAndCleanup('outfits', outfits);
   }, [outfits]);
 
   useEffect(() => {
-    safeSave(`body_profile_${STORAGE_VERSION}`, bodyProfile);
+    safeSaveAndCleanup('body_profile', bodyProfile);
   }, [bodyProfile]);
+
+  // 全局数据导入功能（用于跨设备或手动迁移）
+  const handleImportData = (data: { closetItems: ClosetItem[], outfits: Outfit[], bodyProfile: BodyProfile }) => {
+    if (confirm('导入将覆盖当前所有衣橱数据，确定继续吗？')) {
+      setClosetItems(data.closetItems);
+      setOutfits(data.outfits);
+      setBodyProfile(data.bodyProfile);
+      alert('数据导入成功！');
+    }
+  };
 
   const handleAddItem = (item: ClosetItem) => {
     setClosetItems([item, ...closetItems]);
@@ -199,6 +228,7 @@ const App: React.FC = () => {
                 outfits={outfits}
                 bodyProfile={bodyProfile}
                 onUpdateBodyProfile={handleUpdateBodyProfile}
+                onImportData={handleImportData}
               />
             )}
           </div>
