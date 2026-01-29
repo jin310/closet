@@ -8,53 +8,79 @@ import { AddItemModal } from './components/AddItemModal.tsx';
 import { ClosetItem, Outfit, BodyProfile } from './types.ts';
 import { MOCK_ITEMS } from './constants.ts';
 
+const STORAGE_VERSION = 'v2';
+const PREVIOUS_VERSION = 'v1';
+
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'closet' | 'outfit' | 'profile'>('closet');
   const [isBuildingOutfit, setIsBuildingOutfit] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [focusedOutfitId, setFocusedOutfitId] = useState<string | null>(null);
 
-  // --- 数据持久化逻辑 ---
-  
-  // 初始化单品：优先从本地存储读取
-  const [closetItems, setClosetItems] = useState<ClosetItem[]>(() => {
-    const saved = localStorage.getItem('closet_items_v1');
-    return saved ? JSON.parse(saved) : MOCK_ITEMS;
-  });
+  const getInitialDataWithMigration = <T,>(keyPrefix: string, defaultValue: T): T => {
+    try {
+      const currentKey = `${keyPrefix}_${STORAGE_VERSION}`;
+      const previousKey = `${keyPrefix}_${PREVIOUS_VERSION}`;
+      
+      const savedCurrent = localStorage.getItem(currentKey);
+      if (savedCurrent) {
+        return JSON.parse(savedCurrent);
+      }
 
-  // 初始化穿搭：优先从本地存储读取
-  const [outfits, setOutfits] = useState<Outfit[]>(() => {
-    const saved = localStorage.getItem('outfits_v1');
-    return saved ? JSON.parse(saved) : [];
-  });
+      const savedPrevious = localStorage.getItem(previousKey);
+      if (savedPrevious) {
+        console.log(`自动迁移数据: ${previousKey} -> ${currentKey}`);
+        return JSON.parse(savedPrevious);
+      }
+    } catch (e) {
+      console.warn(`读取数据失败 (${keyPrefix})，已重置为默认值`, e);
+    }
+    return defaultValue;
+  };
 
-  // 初始化身材档案：优先从本地存储读取
-  const [bodyProfile, setBodyProfile] = useState<BodyProfile>(() => {
-    const saved = localStorage.getItem('body_profile_v1');
-    return saved ? JSON.parse(saved) : {
+  const [closetItems, setClosetItems] = useState<ClosetItem[]>(() => 
+    getInitialDataWithMigration('closet_items', MOCK_ITEMS)
+  );
+
+  const [outfits, setOutfits] = useState<Outfit[]>(() => 
+    getInitialDataWithMigration('outfits', [])
+  );
+
+  const [bodyProfile, setBodyProfile] = useState<BodyProfile>(() => 
+    getInitialDataWithMigration('body_profile', {
       height: '175',
       weight: '65',
       shoulder: '42',
       chest: '90',
       waist: '72',
       hips: '92'
-    };
-  });
+    })
+  );
 
-  // 监听数据变化并自动保存
+  // 安全保存函数，防止 QuotaExceededError 崩溃
+  const safeSave = (key: string, data: any) => {
+    try {
+      localStorage.setItem(key, JSON.stringify(data));
+    } catch (e) {
+      if (e instanceof DOMException && e.name === 'QuotaExceededError') {
+        alert('衣橱空间已满（浏览器限制），请尝试删除不需要的旧单品。');
+      } else {
+        console.error('保存数据时出错', e);
+      }
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem('closet_items_v1', JSON.stringify(closetItems));
+    safeSave(`closet_items_${STORAGE_VERSION}`, closetItems);
   }, [closetItems]);
 
   useEffect(() => {
-    localStorage.setItem('outfits_v1', JSON.stringify(outfits));
+    safeSave(`outfits_${STORAGE_VERSION}`, outfits);
   }, [outfits]);
 
   useEffect(() => {
-    localStorage.setItem('body_profile_v1', JSON.stringify(bodyProfile));
+    safeSave(`body_profile_${STORAGE_VERSION}`, bodyProfile);
   }, [bodyProfile]);
-
-  // --- 业务处理逻辑 ---
 
   const handleAddItem = (item: ClosetItem) => {
     setClosetItems([item, ...closetItems]);
@@ -98,7 +124,6 @@ const App: React.FC = () => {
 
   return (
     <div className="flex flex-col h-full w-full max-w-md mx-auto bg-white relative overflow-hidden">
-      {/* Header */}
       <header className="safe-top bg-white/80 backdrop-blur-md z-50 border-b border-gray-50 flex-shrink-0">
         <div className="px-6 h-14 flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -180,26 +205,16 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Navigation */}
       {!isBuildingOutfit && (
         <nav className="bg-white/95 backdrop-blur-md border-t border-gray-50 flex-shrink-0 safe-bottom">
           <div className="flex justify-around items-center h-16">
-            <button 
-              onClick={() => setActiveTab('closet')}
-              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'closet' ? 'text-black' : 'text-gray-300'}`}
-            >
+            <button onClick={() => setActiveTab('closet')} className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'closet' ? 'text-black' : 'text-gray-300'}`}>
               <span className="text-2xl mb-1">{activeTab === 'closet' ? '🧥' : '📁'}</span>
             </button>
-            <button 
-              onClick={() => setActiveTab('outfit')}
-              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'outfit' ? 'text-black' : 'text-gray-300'}`}
-            >
+            <button onClick={() => setActiveTab('outfit')} className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'outfit' ? 'text-black' : 'text-gray-300'}`}>
               <span className="text-2xl mb-1">{activeTab === 'outfit' ? '✨' : '🎨'}</span>
             </button>
-            <button 
-              onClick={() => setActiveTab('profile')}
-              className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'text-black' : 'text-gray-300'}`}
-            >
+            <button onClick={() => setActiveTab('profile')} className={`flex flex-col items-center justify-center w-full h-full transition-all ${activeTab === 'profile' ? 'text-black' : 'text-gray-300'}`}>
               <span className="text-2xl mb-1">{activeTab === 'profile' ? '👤' : '🔘'}</span>
             </button>
           </div>

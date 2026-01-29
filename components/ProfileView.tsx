@@ -1,7 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
 import { BodyProfile, ClosetItem, MainCategory, Outfit } from '../types.ts';
-import { CATEGORIES } from '../constants.ts';
 
 interface ProfileViewProps {
   items: ClosetItem[];
@@ -96,7 +95,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
       monthlyData,
       peakMonth: peakMonthIndex !== -1 ? `${peakMonthIndex + 1}月` : '暂无数据',
       avgPrice: annualCount > 0 ? (annualSpending / annualCount).toFixed(0) : '0',
-      currentYear
+      currentYear,
+      maxMonthCount
     };
   }, [items]);
 
@@ -156,47 +156,76 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
 
       <div className="px-6 space-y-12">
         {/* 年度购买洞察 */}
-        <section className="bg-gray-50/50 rounded-[32px] p-8 border border-gray-100">
+        <section className="bg-gray-50/50 rounded-[32px] p-8 border border-gray-100 shadow-sm">
           <div className="flex justify-between items-center mb-8">
             <h3 className="text-[11px] text-black font-bold uppercase tracking-[0.2em]">{stats.currentYear} 年度购置洞察</h3>
             <span className="text-[9px] text-gray-300 uppercase">Analysis</span>
           </div>
           
           <div className="grid grid-cols-2 gap-8 mb-10">
-            <div>
-              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">年度总花费</p>
+            <div className="group">
+              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider group-hover:text-black transition-colors">年度总花费</p>
               <p className="text-2xl text-black font-light">¥{stats.annualSpending.toLocaleString()}</p>
             </div>
-            <div>
-              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">购物最勤月</p>
+            <div className="group">
+              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider group-hover:text-black transition-colors">购物最勤月</p>
               <p className="text-2xl text-pink-400 font-light">{stats.peakMonth}</p>
             </div>
-            <div>
-              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">购入单品</p>
+            <div className="group">
+              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider group-hover:text-black transition-colors">购入单品</p>
               <p className="text-2xl text-black font-light">{stats.annualCount} <span className="text-sm">件</span></p>
             </div>
-            <div>
-              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider">件均单价</p>
+            <div className="group">
+              <p className="text-[10px] text-gray-400 mb-1 uppercase tracking-wider group-hover:text-black transition-colors">件均单价</p>
               <p className="text-2xl text-black font-light">¥{stats.avgPrice}</p>
             </div>
           </div>
 
-          {/* 月度趋势图 */}
-          <div className="space-y-4">
-            <p className="text-[9px] text-gray-300 uppercase tracking-[0.2em] mb-4">Monthly Trends (Items)</p>
-            <div className="flex items-end justify-between h-20 gap-1.5 px-2">
+          {/* 升级后的月度趋势图表 */}
+          <div className="mt-8 pt-8 border-t border-gray-100/80">
+            <div className="flex justify-between items-end mb-6">
+              <p className="text-[9px] text-gray-400 uppercase tracking-[0.2em]">月度购买分布 (件)</p>
+              <div className="flex gap-4">
+                 <div className="flex items-center gap-1.5">
+                   <div className="w-1.5 h-1.5 rounded-full bg-black"></div>
+                   <span className="text-[8px] text-gray-400 uppercase">常规</span>
+                 </div>
+                 <div className="flex items-center gap-1.5">
+                   <div className="w-1.5 h-1.5 rounded-full bg-pink-300"></div>
+                   <span className="text-[8px] text-gray-400 uppercase">最高</span>
+                 </div>
+              </div>
+            </div>
+            
+            <div className="relative h-32 flex items-end justify-between gap-1 px-1">
+              {/* 背景参考线 */}
+              <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-6">
+                 {[...Array(4)].map((_, i) => (
+                   <div key={i} className="w-full border-t border-gray-100/60 h-0"></div>
+                 ))}
+              </div>
+
               {stats.monthlyData.map((data, i) => {
-                const maxCount = Math.max(...stats.monthlyData.map(d => d.count), 1);
-                const height = (data.count / maxCount) * 100;
+                const max = Math.max(stats.maxMonthCount, 1);
+                const height = (data.count / max) * 100;
+                const isPeak = data.count === stats.maxMonthCount && data.count > 0;
+                
                 return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2 group">
-                    <div className="w-full bg-gray-100 rounded-t-full relative overflow-hidden flex items-end" style={{ height: '100%' }}>
+                  <div key={i} className="flex-1 flex flex-col items-center group relative z-10 h-full justify-end">
+                    {/* 点击/悬浮数值提示 */}
+                    <div className="absolute -top-6 opacity-0 group-active:opacity-100 group-hover:opacity-100 transition-all duration-300 bg-black text-white text-[8px] px-1.5 py-0.5 rounded shadow-lg pointer-events-none transform -translate-y-1">
+                      {data.count}件
+                    </div>
+                    
+                    <div className="w-full bg-gray-100/40 rounded-t-full relative overflow-hidden flex items-end h-24">
                       <div 
-                        className={`w-full rounded-t-full transition-all duration-1000 ${data.count === maxCount ? 'bg-pink-300' : 'bg-black'}`}
+                        className={`w-full rounded-t-full transition-all duration-1000 ease-out ${isPeak ? 'bg-pink-300' : 'bg-black'}`}
                         style={{ height: `${height}%` }}
                       />
                     </div>
-                    <span className="text-[8px] text-gray-300">{i + 1}月</span>
+                    <span className={`text-[8px] mt-2 transition-colors ${isPeak ? 'text-pink-400 font-bold' : 'text-gray-300'}`}>
+                      {i + 1}月
+                    </span>
                   </div>
                 );
               })}
@@ -212,7 +241,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
           </div>
           <div className="grid grid-cols-2 gap-3">
             {Object.entries(stats.seasonStats).map(([label, count]) => (
-              <div key={label} className="bg-white border border-gray-50 p-4 rounded-2xl flex justify-between items-center">
+              <div key={label} className="bg-white border border-gray-50 p-4 rounded-2xl flex justify-between items-center hover:border-gray-200 transition-colors">
                 <span className="text-xs text-gray-500">{label}季</span>
                 <span className="text-sm text-black font-light">{count} 件</span>
               </div>
@@ -228,7 +257,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
           </div>
           <div className="flex flex-wrap gap-3">
             {Object.entries(stats.colorStats).sort(([, a], [, b]) => (b as number) - (a as number)).slice(0, 6).map(([color, count]) => (
-              <div key={color} className="flex flex-col items-center gap-2 bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 min-w-[70px]">
+              <div key={color} className="flex flex-col items-center gap-2 bg-gray-50 px-4 py-3 rounded-2xl border border-gray-100 min-w-[70px] hover:bg-white transition-colors">
                 <span className="text-xs text-black font-medium">{color}</span>
                 <span className="text-[9px] text-gray-400">{count} 件</span>
               </div>
@@ -244,7 +273,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ items, outfits, bodyPr
           </div>
           <div className="space-y-3">
             {stats.expensiveItems.map((item, idx) => (
-              <div key={item.id} className="flex items-center gap-4 bg-white border border-gray-50 p-3 rounded-2xl shadow-sm">
+              <div key={item.id} className="flex items-center gap-4 bg-white border border-gray-50 p-3 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="text-[10px] font-bold text-gray-200 w-4 italic">{idx + 1}</div>
                 <img src={item.imageUrl} className="w-12 h-12 rounded-xl object-cover" />
                 <div className="flex-1 min-w-0">

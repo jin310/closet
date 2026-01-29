@@ -1,7 +1,6 @@
 
 import React, { useState, useRef } from 'react';
 import { ClosetItem, MainCategory } from '../types.ts';
-import { analyzeClothingImage } from '../services/geminiService.ts';
 
 interface AddItemModalProps {
   onClose: () => void;
@@ -23,7 +22,7 @@ const InputField = ({ label, value, onChange, placeholder, type = "text" }: { la
 
 export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) => {
   const [image, setImage] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<Partial<ClosetItem>>({
@@ -40,33 +39,56 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
     purchaseDate: new Date().toISOString().split('T')[0]
   });
 
+  // 图片压缩函数：解决 iOS 存储配额问题的核心
+  const compressImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = base64Str;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const MAX_WIDTH = 800; // 限制最大宽度，足以清晰显示
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, width, height);
+        // 使用 0.7 的质量进行压缩，显著减小体积
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+    });
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setIsProcessing(true);
     const reader = new FileReader();
     reader.onloadend = async () => {
       const base64 = reader.result as string;
-      setImage(base64);
-      
-      setIsAnalyzing(true);
       try {
-        const result = await analyzeClothingImage(base64);
-        if (result) {
-          setFormData(prev => ({
-            ...prev,
-            name: result.suggestedName || prev.name,
-            mainCategory: (result.mainCategory as MainCategory) || prev.mainCategory,
-            subCategory: result.subCategory || prev.subCategory,
-            color: result.color || prev.color,
-            style: result.style || prev.style,
-            season: result.season || prev.season
-          }));
-        }
+        const compressed = await compressImage(base64);
+        setImage(compressed);
       } catch (err) {
-        console.error("Analysis failed", err);
+        console.error("图片处理失败", err);
+        setImage(base64); // 退而求其次使用原图
       } finally {
-        setIsAnalyzing(false);
+        setIsProcessing(false);
       }
     };
     reader.readAsDataURL(file);
@@ -103,13 +125,27 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
         <div className="px-4 h-14 flex justify-between items-center">
           <button onClick={onClose} className="text-gray-400 text-xs tracking-widest px-2">取消</button>
           <h2 className="text-sm font-normal tracking-[0.15em] text-black">录入单品</h2>
-          <button onClick={handleSubmit} disabled={!image || isAnalyzing || !formData.name} className="text-black text-xs font-normal tracking-widest px-2 disabled:opacity-20">完成</button>
+          <button 
+            onClick={handleSubmit} 
+            disabled={!image || !formData.name || isProcessing} 
+            className="text-black text-xs font-normal tracking-widest px-2 disabled:opacity-20"
+          >
+            完成
+          </button>
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-40 scrollbar-hide">
-        <div onClick={() => fileInputRef.current?.click()} className="aspect-square w-full bg-gray-50 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer">
-          {image ? (
+        <div 
+          onClick={() => !isProcessing && fileInputRef.current?.click()} 
+          className="aspect-square w-full bg-gray-50 flex flex-col items-center justify-center relative overflow-hidden group cursor-pointer"
+        >
+          {isProcessing ? (
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mb-3"></div>
+              <p className="text-[10px] text-gray-400 uppercase tracking-widest">正在优化图片...</p>
+            </div>
+          ) : image ? (
             <img src={image} className="w-full h-full object-cover" alt="Preview" />
           ) : (
             <div className="text-center p-10 flex flex-col items-center">
@@ -120,18 +156,11 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
             </div>
           )}
           <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
-          {isAnalyzing && (
-            <div className="absolute inset-0 bg-white/60 backdrop-blur-sm flex flex-col items-center justify-center z-10">
-              <div className="w-8 h-8 border-2 border-black border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-[10px] font-normal uppercase tracking-widest animate-pulse text-black">AI 智能属性分析中...</p>
-            </div>
-          )}
         </div>
 
         <div className="px-6 py-8 space-y-8">
           <InputField label="单品名称" value={formData.name} onChange={v => setFormData({...formData, name: v})} placeholder="例如: 极简白色衬衫" />
 
-          {/* 季节选择器 */}
           <div className="space-y-3">
             <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">适用季节</label>
             <div className="flex gap-2">
@@ -152,7 +181,11 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
           <div className="grid grid-cols-2 gap-x-6">
             <div className="space-y-1.5 border-b border-gray-50 py-3">
               <label className="text-[10px] font-normal text-gray-400 uppercase tracking-widest">主分类</label>
-              <select value={formData.mainCategory} onChange={e => setFormData({...formData, mainCategory: e.target.value as MainCategory})} className="w-full text-sm bg-transparent outline-none py-1 h-8">
+              <select 
+                value={formData.mainCategory} 
+                onChange={e => setFormData({...formData, mainCategory: e.target.value as MainCategory})} 
+                className="w-full text-sm bg-transparent outline-none py-1 h-8"
+              >
                 {Object.values(MainCategory).map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
             </div>
@@ -177,8 +210,12 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({ onClose, onAdd }) =>
       </div>
 
       <div className="safe-bottom fixed bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-md border-t border-gray-50 z-[90]">
-        <button onClick={handleSubmit} disabled={!image || isAnalyzing || !formData.name} className="w-full bg-black text-white py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/10 active:scale-[0.98] transition-all disabled:opacity-20">
-          确认添加至衣橱
+        <button 
+          onClick={handleSubmit} 
+          disabled={!image || !formData.name || isProcessing} 
+          className="w-full bg-black text-white py-4 rounded-2xl text-[11px] uppercase tracking-[0.2em] shadow-xl shadow-black/10 active:scale-[0.98] transition-all disabled:opacity-20"
+        >
+          {isProcessing ? '处理中...' : '确认添加至衣橱'}
         </button>
       </div>
 
